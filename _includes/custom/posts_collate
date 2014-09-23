@@ -1,0 +1,70 @@
+{% comment %}<!--
+Collate_posts helper. Collated posts by year and month.
+Usage:
+  1) assign the 'posts_collate' variable to a valid array of posts.
+  2) include JB/posts_collate
+  example:
+    {% assign posts_collate = site.posts %}
+    {% include JB/posts_collate %}
+
+  Ordering:
+    Posts are displayed in reverse chronological order.
+    For normal chronological order:
+      1) Change the for loop to this:
+        => 'for post in site.posts reversed'
+      2) Next make sure to change 'post.previous.date' to:
+        => 'post.next.date'
+        
+-->{% endcomment %}
+
+  {% for post in posts_collate  %}
+    {% capture this_year %}{{ post.date | date: "%Y" }}{% endcapture %}
+    {% capture this_month %}{{ post.date | date: "%B" }}{% endcapture %}
+    {% capture this_day %}{{ post.date | date: "%e" }}{% endcapture %}
+    {% capture next_year %}{{ post.previous.date | date: "%Y" }}{% endcapture %}
+    {% capture next_month %}{{ post.previous.date | date: "%B" }}{% endcapture %}
+  
+    {% if forloop.first %}
+      <h2><span class="label label-info">{{this_year}}</span></h2>
+      <h3>{{this_month}}</h3>
+    {% endif %}
+    <article class="notepad-index-post post row">
+        <div class="small-12 medium-3 large-2 columns datetime">
+            <span class="notepad-post-meta">
+                <time datetime="{{ post.date | date_to_xmlschema }}">
+                    <span class="day">
+                        {{ this_day }}
+                    </span>
+                    <span class="month-year">
+                        {{ this_month }}
+                    </span>
+                </time>
+            </span>
+        </div>
+        <div class="small-12 medium-9 large-10 columns">
+            <header class="notepad-post-header">
+                <h4 class="notepad-post-title">
+                    <a href="{{ site.url }}{{ post.url }}">
+                        {{ post.title }}
+                    </a>
+                </h4>
+            </header>
+            <section class="notepad-post-excerpt">
+                <p>{{ post.excerpt | truncate:40 }}</p>
+            </section>
+        </div>
+    </article>
+    {% if forloop.last %}
+
+    {% else %}
+      {% if this_year != next_year %}
+        <h2><span class="label label-info">{{next_year}}</span></h2>
+        <h3>{{next_month}}</h3>
+      {% else %}    
+        {% if this_month != next_month %}
+          <h3>{{next_month}}</h3>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% assign posts_collate = nil %}
